@@ -670,7 +670,6 @@
     <button class="tab-btn active" onclick="showTab('folgen', this)">🎙️ Takeda Kids</button>
     <button class="tab-btn" onclick="showTab('erwachsene', this)">🎙️ Sobukan 15</button>
     <button class="tab-btn" onclick="showTab('info', this)">🛒 Goodies bestellen </button>
-    <button class="tab-btn" onclick="showTab('mitglieder', this)">📝 Mitglieder Anmeldung</button>
     <!-- Trainer-Tabs werden per JS eingefügt -->
   </div>
 
@@ -838,108 +837,6 @@
       <div class="success-toast" id="order-toast">✅ Bestellung wurde übermittelt!</div>
     </div>
   </div>
-
-  <!-- TAB: Mitglieder Anmeldung -->
-  <div class="tab-content" id="tab-mitglieder">
-    <div class="section-title"><span>📝</span> Mitglieder Anmeldung</div>
-
-    <div class="info-card">
-      <h3>🥋 Sobukan Union Wien</h3>
-      <p>Member of the International Society for Takeda Budo<br>
-      Vereinsadresse: A-1230 Wien, Lemböckgasse 49, Stiege E/5/2 · ZVR-Nr.: 759945149</p>
-    </div>
-
-    <div class="upload-card">
-      <h3>Persönliche Daten</h3>
-
-      <div class="form-field">
-        <label>Nachname</label>
-        <input type="text" id="member-lastname" placeholder="Nachname" />
-      </div>
-      <div class="form-field">
-        <label>Vorname</label>
-        <input type="text" id="member-firstname" placeholder="Vorname" />
-      </div>
-      <div class="form-field">
-        <label>Geburtsdatum</label>
-        <input type="date" id="member-birthdate" />
-      </div>
-      <div class="form-field">
-        <label>Straße & Hausnummer</label>
-        <input type="text" id="member-street" placeholder="z.B. Hauptstraße 12" />
-      </div>
-      <div class="form-field">
-        <label>PLZ</label>
-        <input type="text" id="member-zip" placeholder="z.B. 1010" />
-      </div>
-      <div class="form-field">
-        <label>Ort</label>
-        <input type="text" id="member-city" placeholder="z.B. Wien" />
-      </div>
-      <div class="form-field">
-        <label>Telefon</label>
-        <input type="text" id="member-phone" placeholder="+43 ..." />
-      </div>
-      <div class="form-field">
-        <label>Nationalität</label>
-        <input type="text" id="member-nationality" placeholder="z.B. Österreich" />
-      </div>
-      <div class="form-field">
-        <label>Dojo</label>
-        <input type="text" id="member-dojo" placeholder="z.B. Sobukan 15" />
-      </div>
-      <div class="form-field">
-        <label>Eintrittsdatum</label>
-        <input type="date" id="member-entrydate" />
-      </div>
-      <div class="form-field">
-        <label>E-Mail-Adresse</label>
-        <input type="text" id="member-email" placeholder="deine@email.com" />
-      </div>
-      <div class="form-field">
-        <label>Erziehungsberechtigte/r (nur bei minderjährigen Mitgliedern)</label>
-        <input type="text" id="member-guardian" placeholder="Name des Erziehungsberechtigten" />
-      </div>
-    </div>
-
-    <div class="info-card">
-      <h3>📜 Erklärung</h3>
-      <p>Mit der Anmeldung ersuche ich um Aufnahme in den Sobukan Union Wien und bestätige, die Vereinsstatuten (§5 Beendigung der Mitgliedschaft, §6 Rechte und Pflichten der Mitglieder) zur Kenntnis genommen zu haben und mit ihnen einverstanden zu sein. Ich nehme zur Kenntnis, dass das Training auf eigene Gefahr erfolgt.</p>
-    </div>
-
-    <div class="info-card">
-      <h3>🔒 Datenschutzinformation</h3>
-      <p>Der Verein erhebt bei Anmeldung Name, Vorname, Geburtsdatum, Adresse, Telefonnummer(n), E-Mail-Adresse(n) und Nationalität, bei Minderjährigen zusätzlich die Daten eines Erziehungsberechtigten. Name, Geburtsdatum und Nationalität werden an die International Society for Takeda Budo (ISTB) zum Zweck der Graduierungsverwaltung übermittelt. Adresse, Telefonnummer und E-Mail-Adresse werden im Rahmen der buchhalterischen Aufbewahrungspflicht bis zu 7 Jahre nach Austritt gespeichert; Name, Geburtsdatum und Nationalität mindestens 30 Jahre zum Nachweis von Graduierungen.</p>
-    </div>
-
-    <div class="info-card">
-      <h3>📸 Einwilligung Bildnutzung</h3>
-      <p>Mit dem Eintritt erkläre ich (bzw. mein/e Erziehungsberechtigte/r) mein Einverständnis zur unentgeltlichen Verwendung von im Rahmen des Trainings oder anderer Vereinsaktivitäten erstelltem Foto- und Videomaterial auf der Vereinswebsite, in Publikationen, sozialen Medien und Videoportalen. Ein Widerruf ist jederzeit gegenüber dem Vorstand in schriftlicher Form möglich, jedoch nicht rückwirkend.</p>
-    </div>
-
-    <div class="upload-card">
-      <h3>Zustimmung</h3>
-
-      <label style="display:flex; align-items:flex-start; gap:10px; margin-bottom:14px; cursor:pointer;">
-        <input type="checkbox" id="member-agree-statuten" style="margin-top:3px;">
-        <span style="font-size:0.85rem; color:var(--muted); line-height:1.5;">Ich bestätige die Kenntnisnahme und Zustimmung zu den Vereinsstatuten, der Datenschutzinformation und der Einwilligung zur Bildnutzung.</span>
-      </label>
-
-      <label style="display:flex; align-items:flex-start; gap:10px; margin-bottom:18px; cursor:pointer;">
-        <input type="checkbox" id="member-agree-risk" style="margin-top:3px;">
-        <span style="font-size:0.85rem; color:var(--muted); line-height:1.5;">Ich nehme ausdrücklich zur Kenntnis, dass das Training auf eigene Gefahr erfolgt.</span>
-      </label>
-
-      <div class="form-field">
-        <label>Unterschrift (Name des volljährigen Mitglieds oder eines Erziehungsberechtigten)</label>
-        <input type="text" id="member-signature" placeholder="Vor- und Nachname als digitale Unterschrift" />
-      </div>
-
-      <button class="btn-upload" id="member-submit-btn" onclick="submitMember()">✅ Anmeldung absenden</button>
-      <div class="success-toast" id="member-toast">✅ Anmeldung wurde übermittelt!</div>
-    </div>
-  </div>
-
 <script>
 // ════════════════════════════════════════
 //   KONFIGURATION — hier anpassen!
