@@ -669,7 +669,8 @@
   <div class="tabs" id="tab-bar">
     <button class="tab-btn active" onclick="showTab('folgen', this)">🎙️ Takeda Kids</button>
     <button class="tab-btn" onclick="showTab('erwachsene', this)">🎙️ Sobukan 15</button>
-    <button class="tab-btn" onclick="showTab('info', this)">🛒 Goodies bestellen </button>
+    <button class="tab-btn" onclick="showTab('info', this)">🛒 Goodies bestellen</button>
+    <button class="tab-btn" onclick="showTab('mitglieder', this)">📝 Anmeldung</button>
     <!-- Trainer-Tabs werden per JS eingefügt -->
   </div>
 
@@ -835,6 +836,43 @@
       </div>
       <button class="btn-upload" id="order-submit-btn" onclick="submitOrder()">📧 Bestellung absenden</button>
       <div class="success-toast" id="order-toast">✅ Bestellung wurde übermittelt!</div>
+    </div>
+  </div>
+
+  <!-- TAB: Anmeldung -->
+  <div class="tab-content" id="tab-mitglieder">
+    <div class="section-title"><span>📝</span> Anmeldung</div>
+
+    <div class="upload-card">
+      <h3>Deine Daten</h3>
+
+      <div class="form-field">
+        <label>Nachname</label>
+        <input type="text" id="member-lastname" placeholder="Nachname" />
+      </div>
+      <div class="form-field">
+        <label>Vorname</label>
+        <input type="text" id="member-firstname" placeholder="Vorname" />
+      </div>
+      <div class="form-field">
+        <label>Geburtsdatum</label>
+        <input type="date" id="member-birthdate" />
+      </div>
+      <div class="form-field">
+        <label>Dojo</label>
+        <input type="text" id="member-dojo" placeholder="z.B. Sobukan 15" />
+      </div>
+      <div class="form-field">
+        <label>E-Mail-Adresse</label>
+        <input type="text" id="member-email" placeholder="deine@email.com" />
+      </div>
+      <div class="form-field">
+        <label>Graduierung</label>
+        <input type="text" id="member-grad" placeholder="z.B. 5. Kyu" />
+      </div>
+
+      <button class="btn-upload" id="member-submit-btn" onclick="submitMember()">✅ Absenden</button>
+      <div class="success-toast" id="member-toast">✅ Anmeldung wurde übermittelt!</div>
     </div>
   </div>
 <script>
@@ -1187,37 +1225,16 @@ function submitMember() {
   const lastname = document.getElementById('member-lastname').value.trim();
   const firstname = document.getElementById('member-firstname').value.trim();
   const birthdate = document.getElementById('member-birthdate').value;
-  const street = document.getElementById('member-street').value.trim();
-  const zip = document.getElementById('member-zip').value.trim();
-  const city = document.getElementById('member-city').value.trim();
-  const phone = document.getElementById('member-phone').value.trim();
-  const nationality = document.getElementById('member-nationality').value.trim();
   const dojo = document.getElementById('member-dojo').value.trim();
-  const entrydate = document.getElementById('member-entrydate').value;
   const email = document.getElementById('member-email').value.trim();
-  const guardian = document.getElementById('member-guardian').value.trim();
-  const agreeStatuten = document.getElementById('member-agree-statuten').checked;
-  const agreeRisk = document.getElementById('member-agree-risk').checked;
-  const signature = document.getElementById('member-signature').value.trim();
+  const grad = document.getElementById('member-grad').value.trim();
 
   if (!lastname || !firstname || !email) {
     alert('Bitte mindestens Nachname, Vorname und E-Mail-Adresse ausfüllen.');
     return;
   }
-  if (!agreeStatuten || !agreeRisk) {
-    alert('Bitte beide Zustimmungen ankreuzen, um fortzufahren.');
-    return;
-  }
-  if (!signature) {
-    alert('Bitte die digitale Unterschrift (Name) eintragen.');
-    return;
-  }
 
-  const payload = {
-    lastname, firstname, birthdate, street, zip, city, phone,
-    nationality, dojo, entrydate, email, guardian,
-    agreeStatuten, agreeRisk, signature
-  };
+  const payload = { lastname, firstname, birthdate, dojo, email, grad };
 
   const btn = document.getElementById('member-submit-btn');
   btn.disabled = true;
@@ -1230,17 +1247,15 @@ function submitMember() {
     body: JSON.stringify(payload)
   }).then(() => {
     document.querySelectorAll('#tab-mitglieder input[type="text"], #tab-mitglieder input[type="date"]').forEach(el => el.value = '');
-    document.getElementById('member-agree-statuten').checked = false;
-    document.getElementById('member-agree-risk').checked = false;
     const toast = document.getElementById('member-toast');
     toast.style.display = 'block';
     setTimeout(() => { toast.style.display = 'none'; }, 4000);
     btn.disabled = false;
-    btn.textContent = '✅ Anmeldung absenden';
+    btn.textContent = '✅ Absenden';
   }).catch(() => {
     alert('Etwas ist schiefgelaufen. Bitte versuch es nochmal.');
     btn.disabled = false;
-    btn.textContent = '✅ Anmeldung absenden';
+    btn.textContent = '✅ Absenden';
   });
 }
 
