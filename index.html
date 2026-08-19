@@ -1333,6 +1333,7 @@ function doLogin() {
   renderCart();
   // Set today's date in date input
   document.getElementById('ep-date-input').value = new Date().toISOString().split('T')[0];
+  openTabFromURL();
 }
 
 document.getElementById('code-input').addEventListener('keydown', e => {
@@ -1378,6 +1379,16 @@ function showTab(name, btn) {
   btn.classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
   if (name === 'manage') renderManage();
+}
+
+function openTabFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get('tab');
+  if (!tab) return;
+  const btn = Array.from(document.querySelectorAll('.tab-btn'))
+    .find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${tab}'`));
+  const content = document.getElementById('tab-' + tab);
+  if (btn && content) showTab(tab, btn);
 }
 
 function epCard(ep, isNewest) {
