@@ -670,7 +670,7 @@
     <button class="tab-btn active" onclick="showTab('folgen', this)">🎙️ Takeda Kids</button>
     <button class="tab-btn" onclick="showTab('erwachsene', this)">🎙️ Sobukan 15</button>
     <button class="tab-btn" onclick="showTab('info', this)">🛒 Goodies bestellen</button>
-    <button class="tab-btn" onclick="showTab('mitglieder', this)">📝 Anmeldung</button>
+    <button class="tab-btn" onclick="showTab('mitglieder', this)">📝 Newsletter Anmeldung</button>
     <!-- Trainer-Tabs werden per JS eingefügt -->
   </div>
 
@@ -866,11 +866,6 @@
         <label>E-Mail-Adresse</label>
         <input type="text" id="member-email" placeholder="deine@email.com" />
       </div>
-      <div class="form-field">
-        <label>Graduierung</label>
-        <input type="text" id="member-grad" placeholder="z.B. 5. Kyu" />
-      </div>
-
       <button class="btn-upload" id="member-submit-btn" onclick="submitMember()">✅ Absenden</button>
       <div class="success-toast" id="member-toast">✅ Anmeldung wurde übermittelt!</div>
     </div>
