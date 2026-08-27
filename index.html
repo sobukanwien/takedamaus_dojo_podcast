@@ -969,14 +969,8 @@ const ALLE_FOLGEN = [
     desc: "",
     date: "2026-06-26",
     url: "Takeda%20Maus%20Kendo%206.mp3"
-  },
-  {
-    id: 13,
-    title: "Takeda Maus – Kampfkunstgeschichte 1",
-    desc: "",
-    date: "2026-07-12",
-    url: "Takeda%20Maus%20Kampfkunstgeschichte%201.mp3"
-  }// Neue Folge hinzufügen:
+  }
+ // Neue Folge hinzufügen:
   // ,{
   //   id: 4,
   //   title: "Takeda Maus Kendo 2",
@@ -1435,10 +1429,6 @@ function renderEpisodes() {
         <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:var(--gold); border-bottom:2px solid var(--gold); padding-bottom:8px; margin-bottom:12px;">⚔️ Kendo</div>
         ${kendo.map(ep => epCard(ep, ep.id === newestId)).join('')}
       </div> 
-      <div>
-        <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:#4ADE80; border-bottom:2px solid #4ADE80; padding-bottom:8px; margin-bottom:12px;">📖 Kinder Budo-Geschichten </div>
-        ${geschichten.map(ep => epCard(ep, ep.id === newestId)).join('')}
-      </div>
     </div>`;
 }
   
