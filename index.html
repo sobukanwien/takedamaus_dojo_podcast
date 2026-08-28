@@ -1450,8 +1450,9 @@ function renderEpisodes() {
   const newestId = sorted[0]?.id;
 
   // Pro Saison eigene Kategorien mit Stichwort-Erkennung im Titel
-  const SEASON_KATEGORIEN = {
+    const SEASON_KATEGORIEN = {
     'WS26-27': [
+      { label: 'Specials', icon: '🤸', color: '#B565F5', match: t => t.includes('specials') },
       { label: 'Körperspannung', icon: '💪', color: '#4DA6FF', match: t => t.includes('körperspannung') },
       { label: 'Reaktion', icon: '⚡', color: 'var(--red)', match: t => t.includes('reaktion') },
       { label: 'Ideale Distanz (Ma-ai)', icon: '📏', color: 'var(--gold)', match: t => t.includes('ma-ai') || t.includes('distanz') }
