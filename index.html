@@ -669,7 +669,7 @@
   <div class="tabs" id="tab-bar">
     <button class="tab-btn active" onclick="showTab('folgen', this)">🎙️ Takeda Kids</button>
     <button class="tab-btn" onclick="showTab('erwachsene', this)">🎙️ Sobukan 15</button>
-    <button class="tab-btn" onclick="showTab('info', this)">🛒 Goodies bestellen</button>
+       <button class="tab-btn" id="tab-goodies-btn" onclick="showTab('info', this)">🛒 Goodies bestellen</button>
     <!-- Trainer-Tabs werden per JS eingefügt -->
   </div>
 
@@ -879,11 +879,12 @@
 // ════════════════════════════════════════
 const PASSWORDS = {
   "KOBILZA":   "eltern",
-  "TAKEDAMAUS36": "trainer"
+  "TAKEDAMAUS2627": "trainer"
   // Füge hier weitere Codes hinzu:
   // "MEINCODE123": "eltern",
 };
-
+// Sobukan Goodies Tab ein-/ausblenden (true = sichtbar, false = versteckt)
+const SHOW_GOODIES = false;
 // ════════════════════════════════════════
 //   FOLGEN — hier neue Folgen eintragen!
 //   Dateinamen exakt so wie auf GitHub.
@@ -1072,6 +1073,11 @@ const PRODUKTE = [
   //   farben: ["Schwarz","Weiß"]
   // }
 ];
+
+if (!SHOW_GOODIES) {
+  const goodiesBtn = document.getElementById('tab-goodies-btn');
+  if (goodiesBtn) goodiesBtn.style.display = 'none';
+}
 
 let cart = {}; // key: "produktId-farbe-groesse" → {produktId, name, farbe, groesse, menge, preis}
 let qtyState = {}; // aktuelle Anzahl-Auswahl pro Produkt, bevor "In den Warenkorb"
