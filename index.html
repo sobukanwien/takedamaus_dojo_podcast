@@ -895,6 +895,8 @@ const PASSWORDS = {
 };
 // Sobukan Goodies Tab ein-/ausblenden (true = sichtbar, false = versteckt)
 const SHOW_GOODIES = false;
+  // Trainer-Tabs "Neue Folge" & "Verwalten" ein-/ausblenden (true = sichtbar, false = versteckt)
+const SHOW_TRAINER_TABS = false;
 // ════════════════════════════════════════
 //   FOLGEN — hier neue Folgen eintragen!
 //   Dateinamen exakt so wie auf GitHub.
@@ -1369,7 +1371,7 @@ function doLogin() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-screen').style.display = 'block';
 
-  if (role === 'trainer') {
+  if (role === 'trainer' && SHOW_TRAINER_TABS) {
     addTrainerTabs();
   }
 
