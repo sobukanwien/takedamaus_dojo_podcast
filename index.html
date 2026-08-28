@@ -716,9 +716,9 @@
   <span style="margin-left:auto; background:#E8293A; color:#fff; border-radius:8px; padding:6px 14px; font-size:.8rem; font-weight:700;">⬇ Download</span>
 </a>    
     <div class="section-title"><span>🎙️</span> Folgen Takeda Maus WS26-27 </div>
-    
+    <div id="episode-list-ws"></div>
     <div class="section-title"><span>🎙️</span> Folgen Takeda Maus SS26 </div>
-    <div id="episode-list"></div>
+    <div id="episode-list-ss"></div>
 
     <div class="section-title"><span>🐭</span> Takeda Kids Lehrerteam </div>
     
@@ -1418,28 +1418,28 @@ function epCard(ep, isNewest) {
 
 function renderEpisodes() {
   const eps = getEpisodes();
-  const list = document.getElementById('episode-list');
+  const wsList = document.getElementById('episode-list-ws');
+  const ssList = document.getElementById('episode-list-ss');
+  const emptyMsg = `<div class="empty-state"><div class="icon">🎙️</div><p>Noch keine Folgen vorhanden.<br>Der Trainer wird bald die erste Folge hochladen!</p></div>`;
+
   if (eps.length === 0) {
-    list.innerHTML = `<div class="empty-state"><div class="icon">🎙️</div><p>Noch keine Folgen vorhanden.<br>Der Trainer wird bald die erste Folge hochladen!</p></div>`;
+    wsList.innerHTML = emptyMsg;
+    ssList.innerHTML = emptyMsg;
     return;
   }
 
   const sorted = [...eps].sort((a, b) => b.id - a.id);
   const newestId = sorted[0]?.id;
 
-  const seasons = [
-    { key: 'WS26-27', label: 'Folgen Takeda Maus WS26-27' },
-    { key: 'SS26', label: 'Folgen Takeda Maus SS26' }
-  ];
-
-  list.innerHTML = seasons.map(season => {
-    const seasonEps = sorted.filter(ep => ep.season === season.key);
-    if (seasonEps.length === 0) return '';
+  function buildGrid(seasonKey) {
+    const seasonEps = sorted.filter(ep => ep.season === seasonKey);
+    if (seasonEps.length === 0) {
+      return `<div class="empty-state"><p>Noch keine Folgen für diese Saison.</p></div>`;
+    }
     const kendo    = seasonEps.filter(ep => ep.title.toLowerCase().includes('kendo'));
     const aikido   = seasonEps.filter(ep => ep.title.toLowerCase().includes('aikido'));
     const specials = seasonEps.filter(ep => ep.title.toLowerCase().includes('specials'));
     return `
-      <div class="section-title"><span>🎙️</span> ${season.label}</div>
       <div class="kids-grid">
         <div>
           <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:#4DA6FF; border-bottom:2px solid #4DA6FF; padding-bottom:8px; margin-bottom:12px;">🤸 Specials</div>
@@ -1454,7 +1454,10 @@ function renderEpisodes() {
           ${kendo.map(ep => epCard(ep, ep.id === newestId)).join('')}
         </div>
       </div>`;
-  }).join('');
+  }
+
+  wsList.innerHTML = buildGrid('WS26-27');
+  ssList.innerHTML = buildGrid('SS26');
 }
   
 function renderErwachseneEpisodes() {
