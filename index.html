@@ -894,84 +894,96 @@ const ALLE_FOLGEN = [
     title: "Takeda Maus – Kendo 1",
     desc: "",
     date: "2026-04-12",
-    url: "Takeda%20Maus%20Kendo%201.m4a"
+    url: "Takeda%20Maus%20Kendo%201.m4a",
+    season: "SS26"
   },
   {
     id: 2,
     title: "Takeda Maus - Aikido 1",
     desc: "",
     date: "2026-04-12",
-    url: "Takeda%20Maus%20Aikido%201.mp3"
+    url: "Takeda%20Maus%20Aikido%201.mp3",
+    season: "SS26"
   },
   {
     id: 3,
     title: "Takeda Maus - Aikido 2",
     desc: "",
     date: "2026-04-12",
-    url: "Takeda%20Maus%20Aikido%202.mp3"
+    url: "Takeda%20Maus%20Aikido%202.mp3",
+    season: "SS26"
   },
   {
     id: 4,
     title: "Takeda Maus – Kendo 2",
     desc: "",
     date: "2026-04-17",
-    url: "Takeda%20Maus%20Kendo%202.mp3"
+    url: "Takeda%20Maus%20Kendo%202.mp3",
+    season: "SS26"
   },
   {
     id: 5,
     title: "Takeda Maus – Kendo 3",
     desc: "",
     date: "2026-04-26",
-    url: "Takeda%20Maus%20Kendo%203.mp3"
+    url: "Takeda%20Maus%20Kendo%203.mp3",
+    season: "SS26"
   },
   {
     id: 6,
     title: "Takeda Maus – Aikido 3",
     desc: "",
     date: "2026-05-03",
-    url: "Takeda%20Maus%20Aikido%203.mp3"
+    url: "Takeda%20Maus%20Aikido%203.mp3",
+    season: "SS26"
   },
    {
     id: 7,
     title: "Takeda Maus – Aikido 4",
     desc: "",
     date: "2026-05-10",
-    url: "Takeda%20Maus%20Aikido%204.mp3"
+    url: "Takeda%20Maus%20Aikido%204.mp3",
+    season: "SS26"
   },
    {
     id: 8,
     title: "Takeda Maus – Kendo 4",
     desc: "",
     date: "2026-05-18",
-    url: "Takeda%20Maus%20Kendo%204.mp3"
+    url: "Takeda%20Maus%20Kendo%204.mp3",
+    season: "SS26"
   },
    {
     id: 9,
     title: "Takeda Maus – Kendo 5",
     desc: "",
     date: "2026-05-26",
-    url: "Takeda%20Maus%20Kendo%205.mp3"
+    url: "Takeda%20Maus%20Kendo%205.mp3",
+    season: "SS26"
    },
    {
     id: 10,
     title: "Takeda Maus – Aikido 5",
     desc: "",
     date: "2026-06-07",
-    url: "Takeda%20Maus%20Aikido%205.mp3"
+    url: "Takeda%20Maus%20Aikido%205.mp3",
+    season: "SS26"
   },
   {
     id: 12,
     title: "Takeda Maus – Specials - Taiso 1",
     desc: "",
     date: "2026-06-21",
-    url: "Takeda%20Maus%20Taiso%201.mp3"
+    url: "Takeda%20Maus%20Taiso%201.mp3",
+    season: "SS26"
   },
   {
     id: 11,
     title: "Takeda Maus – Kendo 6",
     desc: "",
     date: "2026-06-26",
-    url: "Takeda%20Maus%20Kendo%206.mp3"
+    url: "Takeda%20Maus%20Kendo%206.mp3",
+    season: "SS26"
   }
  // Neue Folge hinzufügen:
   // ,{
@@ -980,6 +992,7 @@ const ALLE_FOLGEN = [
   //   desc: "",
   //   date: "2026-04-19",
   //   url: "Takeda Maus Kendo 2.mp3"
+  //   season: "WS26-27"
   // }
 ];
   
@@ -1410,29 +1423,38 @@ function renderEpisodes() {
     list.innerHTML = `<div class="empty-state"><div class="icon">🎙️</div><p>Noch keine Folgen vorhanden.<br>Der Trainer wird bald die erste Folge hochladen!</p></div>`;
     return;
   }
- 
+
   const sorted = [...eps].sort((a, b) => b.id - a.id);
-  const kendo  = sorted.filter(ep => ep.title.toLowerCase().includes('kendo'));
-  const aikido = sorted.filter(ep => ep.title.toLowerCase().includes('aikido'));
-  const specials  = sorted.filter(ep => ep.title.toLowerCase().includes('specials'));
-  const geschichten = sorted.filter(ep => ep.title.toLowerCase().includes('geschichte'));
   const newestId = sorted[0]?.id;
 
-  list.innerHTML = `
-    <div class="kids-grid">
-      <div>
-        <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:#4DA6FF; border-bottom:2px solid #4DA6FF; padding-bottom:8px; margin-bottom:12px;">🤸 Specials</div>
-        ${specials.map(ep => epCard(ep, ep.id === newestId)).join('')}
-      </div>
-      <div>
-        <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:var(--red); border-bottom:2px solid var(--red); padding-bottom:8px; margin-bottom:12px;">🥋 Aikido</div>
-        ${aikido.map(ep => epCard(ep, ep.id === newestId)).join('')}
-      </div>
-      <div>
-        <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:var(--gold); border-bottom:2px solid var(--gold); padding-bottom:8px; margin-bottom:12px;">⚔️ Kendo</div>
-        ${kendo.map(ep => epCard(ep, ep.id === newestId)).join('')}
-      </div> 
-    </div>`;
+  const seasons = [
+    { key: 'WS26-27', label: 'Folgen Takeda Maus WS26-27' },
+    { key: 'SS26', label: 'Folgen Takeda Maus SS26' }
+  ];
+
+  list.innerHTML = seasons.map(season => {
+    const seasonEps = sorted.filter(ep => ep.season === season.key);
+    if (seasonEps.length === 0) return '';
+    const kendo    = seasonEps.filter(ep => ep.title.toLowerCase().includes('kendo'));
+    const aikido   = seasonEps.filter(ep => ep.title.toLowerCase().includes('aikido'));
+    const specials = seasonEps.filter(ep => ep.title.toLowerCase().includes('specials'));
+    return `
+      <div class="section-title"><span>🎙️</span> ${season.label}</div>
+      <div class="kids-grid">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:#4DA6FF; border-bottom:2px solid #4DA6FF; padding-bottom:8px; margin-bottom:12px;">🤸 Specials</div>
+          ${specials.map(ep => epCard(ep, ep.id === newestId)).join('')}
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:var(--red); border-bottom:2px solid var(--red); padding-bottom:8px; margin-bottom:12px;">🥋 Aikido</div>
+          ${aikido.map(ep => epCard(ep, ep.id === newestId)).join('')}
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:var(--gold); border-bottom:2px solid var(--gold); padding-bottom:8px; margin-bottom:12px;">⚔️ Kendo</div>
+          ${kendo.map(ep => epCard(ep, ep.id === newestId)).join('')}
+        </div>
+      </div>`;
+  }).join('');
 }
   
 function renderErwachseneEpisodes() {
