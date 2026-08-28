@@ -316,7 +316,7 @@
     text-overflow: ellipsis;
   }
   .ep-meta { font-size: 0.75rem; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
-  .badge-new {
+    .badge-new {
     font-size: 0.6rem;
     font-weight: 800;
     text-transform: uppercase;
@@ -327,6 +327,16 @@
     color: var(--gold);
     border: 1px solid rgba(245,200,66,.4);
   }
+  .badge-disziplin {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .badge-disziplin.aikido { background: rgba(232,41,58,.15); color: var(--red); border: 1px solid rgba(232,41,58,.4); }
+  .badge-disziplin.kendo { background: rgba(245,200,66,.15); color: var(--gold); border: 1px solid rgba(245,200,66,.4); }
   .ep-speaker-img {
     width: 38px;
     height: 38px;
@@ -988,12 +998,13 @@ const ALLE_FOLGEN = [
   }
  // Neue Folge hinzufügen:
   // ,{
-  //   id: 4,
-  //   title: "Takeda Maus Kendo 2",
+  //   id: 13,
+  //   title: "Takeda Maus – Körperspannung 1",
   //   desc: "",
-  //   date: "2026-04-19",
-  //   url: "Takeda Maus Kendo 2.mp3"
-  //   season: "WS26-27"
+  //   date: "2026-10-04",
+  //   url: "Takeda%20Maus%20Koerperspannung%201.mp3",
+  //   season: "WS26-27",
+  //   disziplin: "Aikido"
   // }
 ];
   
@@ -1412,6 +1423,7 @@ function epCard(ep, isNewest) {
         <div class="ep-meta">
           <span>${formatDate(ep.date)}</span>
           ${ep.desc ? `<span>· ${ep.desc.substring(0,50)}${ep.desc.length>50?'…':''}</span>` : ''}
+          ${ep.disziplin ? `<span class="badge-disziplin ${ep.disziplin.toLowerCase()}">${ep.disziplin}</span>` : ''}
           ${isNewest ? '<span class="badge-new">Neu</span>' : ''}
         </div>
       </div>
