@@ -1437,29 +1437,36 @@ function renderEpisodes() {
   const sorted = [...eps].sort((a, b) => b.id - a.id);
   const newestId = sorted[0]?.id;
 
+  // Pro Saison eigene Kategorien mit Stichwort-Erkennung im Titel
+  const SEASON_KATEGORIEN = {
+    'WS26-27': [
+      { label: 'Körperspannung', icon: '💪', color: '#4DA6FF', match: t => t.includes('körperspannung') },
+      { label: 'Reaktion', icon: '⚡', color: 'var(--red)', match: t => t.includes('reaktion') },
+      { label: 'Ideale Distanz (Ma-ai)', icon: '📏', color: 'var(--gold)', match: t => t.includes('ma-ai') || t.includes('distanz') }
+    ],
+    'SS26': [
+      { label: 'Specials', icon: '🤸', color: '#4DA6FF', match: t => t.includes('specials') },
+      { label: 'Aikido', icon: '🥋', color: 'var(--red)', match: t => t.includes('aikido') },
+      { label: 'Kendo', icon: '⚔️', color: 'var(--gold)', match: t => t.includes('kendo') }
+    ]
+  };
+
   function buildGrid(seasonKey) {
     const seasonEps = sorted.filter(ep => ep.season === seasonKey);
-    if (seasonEps.length === 0) {
-      return `<div class="empty-state"><p>Noch keine Folgen für diese Saison.</p></div>`;
-    }
-    const kendo    = seasonEps.filter(ep => ep.title.toLowerCase().includes('kendo'));
-    const aikido   = seasonEps.filter(ep => ep.title.toLowerCase().includes('aikido'));
-    const specials = seasonEps.filter(ep => ep.title.toLowerCase().includes('specials'));
-    return `
-      <div class="kids-grid">
+    const kategorien = SEASON_KATEGORIEN[seasonKey] || [];
+
+    const spalten = kategorien.map(kat => {
+      const katEps = seasonEps.filter(ep => kat.match(ep.title.toLowerCase()));
+      return `
         <div>
-          <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:#4DA6FF; border-bottom:2px solid #4DA6FF; padding-bottom:8px; margin-bottom:12px;">🤸 Specials</div>
-          ${specials.map(ep => epCard(ep, ep.id === newestId)).join('')}
-        </div>
-        <div>
-          <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:var(--red); border-bottom:2px solid var(--red); padding-bottom:8px; margin-bottom:12px;">🥋 Aikido</div>
-          ${aikido.map(ep => epCard(ep, ep.id === newestId)).join('')}
-        </div>
-        <div>
-          <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:var(--gold); border-bottom:2px solid var(--gold); padding-bottom:8px; margin-bottom:12px;">⚔️ Kendo</div>
-          ${kendo.map(ep => epCard(ep, ep.id === newestId)).join('')}
-        </div>
-      </div>`;
+          <div style="font-family:'Bebas Neue',cursive; font-size:1.2rem; letter-spacing:2px; color:${kat.color}; border-bottom:2px solid ${kat.color}; padding-bottom:8px; margin-bottom:12px;">${kat.icon} ${kat.label}</div>
+          ${katEps.length > 0
+            ? katEps.map(ep => epCard(ep, ep.id === newestId)).join('')
+            : `<p style="color: var(--muted); font-size: .85rem;">Noch keine Folgen.</p>`}
+        </div>`;
+    }).join('');
+
+    return `<div class="kids-grid">${spalten}</div>`;
   }
 
   wsList.innerHTML = buildGrid('WS26-27');
