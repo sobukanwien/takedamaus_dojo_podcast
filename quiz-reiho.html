@@ -322,7 +322,7 @@
 (function(){
 
   const PAIRS = [
-    { jp: "Keiko hajimemasu!", de: "Das Training beginnt!" },
+    { jp: "Keiko hajimemasu!", de: "Das Training beginnt!", variant: "Keiko owarimasu!", de:"Das Training ist beendet!" },
     { jp: "Sensei ni taishite rei!", de: "Wir verneigen uns vor den Lehrern!", variant: "Bei zwei Lehrern: „Sensei-gata ni taishite rei!“" },
     { jp: "Otagai ni rei!", de: "Wir verneigen uns voreinander!" }
   ];
@@ -369,7 +369,7 @@
     setDots(0);
     card.innerHTML = `
       <p class="step-title">Bevor es losgeht</p>
-      <p class="step-hint">In dieser Folge hast du drei Reiho-Kommandos gehört. Zuerst ordnest du jeden japanischen Ausdruck seiner Übersetzung zu — danach bringst du alle drei in die richtige Reihenfolge, so wie sie im Training gerufen werden.</p>
+      <p class="step-hint">In dieser Folge hast du die Reiho-Kommandos gehört. Zuerst ordnest du jeden japanischen Ausdruck seiner Übersetzung zu — danach bringst du alle drei in die richtige Reihenfolge, so wie sie im Training gerufen werden.</p>
       <button class="btn" id="start-btn">Quiz starten</button>
     `;
     document.getElementById('start-btn').onclick = renderMatching;
@@ -554,7 +554,7 @@
     card.innerHTML = `
       <div class="result">
         <div class="big-kanji">よくできました</div>
-        <p>Du kennst jetzt die drei Reiho-Kommandos aus dieser Folge.</p>
+        <p>Gut gemacht! Du kennst jetzt die Reiho-Kommandos aus dieser Folge.</p>
         <div class="recap">
           ${PAIRS.map(p => `
             <div class="recap-item">
