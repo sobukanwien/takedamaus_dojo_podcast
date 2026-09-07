@@ -1020,7 +1020,8 @@ const ALLE_FOLGEN = [
   desc: "",
   date: "2026-09-01",
   url: "Takeda%20Maus%20Specials%20kommandos.mp3",
-  season: "WS26-27"
+  season: "WS26-27",
+  quiz: "quiz-reiho.html"
   }
  // Neue Folge hinzufügen:
   // ,{
@@ -1450,9 +1451,9 @@ function openTabFromURL() {
 function epCard(ep, isNewest) {
   const displayTitle = ep.title.replace(/^Takeda Maus\s*[-–]\s*/i, '');
   return `
-    <div class="ep-card ${currentAudioId === ep.id ? 'playing' : ''}" id="epcard-${ep.id}" onclick="playEp(${ep.id})">
-      <div class="ep-num">#${ep.id}</div>
-      <div class="ep-info">
+    <div class="ep-card ${currentAudioId === ep.id ? 'playing' : ''}" id="epcard-${ep.id}">
+      <div class="ep-num" onclick="playEp(${ep.id})">#${ep.id}</div>
+      <div class="ep-info" onclick="playEp(${ep.id})">
         <div class="ep-title">${displayTitle}</div>
         <div class="ep-meta">
           <span>${formatDate(ep.date)}</span>
@@ -1460,9 +1461,14 @@ function epCard(ep, isNewest) {
           ${ep.disziplin ? `<span class="badge-disziplin ${ep.disziplin.toLowerCase()}">${ep.disziplin}</span>` : ''}
           ${isNewest ? '<span class="badge-new">Neu</span>' : ''}
         </div>
+        ${ep.quiz ? `
+        <a href="${ep.quiz}" onclick="event.stopPropagation()"
+           style="display:inline-block; margin-top:8px; font-size:.75rem; font-weight:700; color:var(--gold); border:1px solid var(--gold); border-radius:20px; padding:4px 12px; text-decoration:none;">
+          🎌 Quiz starten
+        </a>` : ''}
       </div>
       ${ep.speaker ? `<img src="${ep.speaker}" alt="Sprecher" class="ep-speaker-img">` : ''}
-      <button class="play-icon ${currentAudioId === ep.id ? '' : 'paused'}" id="playbtn-${ep.id}">
+      <button class="play-icon ${currentAudioId === ep.id ? '' : 'paused'}" id="playbtn-${ep.id}" onclick="playEp(${ep.id})">
         ${currentAudioId === ep.id ? '⏸' : '▶'}
       </button>
     </div>`;
