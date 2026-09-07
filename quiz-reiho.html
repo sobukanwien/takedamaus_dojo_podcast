@@ -171,9 +171,11 @@
     padding: 12px 14px;
     font-style: italic;
     font-size: 14px;
+    color: var(--ink);
+    font-family: inherit;
     cursor:pointer;
     transition: opacity .15s ease, transform .1s ease;
-  }
+}
   .order-tile:active{ transform: scale(0.98); }
   .order-tile.used{
     opacity: .25;
@@ -202,6 +204,9 @@
     font-size: 15px;
     width: 16px;
   }
+  .order-slot .slot-text{
+    color: inherit;
+  }
   .order-slot.filled{
     border-style: solid;
     border-color: var(--panel-line);
@@ -226,6 +231,8 @@
     font-family:'Zen Kaku Gothic New', sans-serif;
     transition: background .15s ease;
   }
+  .btn, .btn.secondary{ color: var(--paper); }
+  .btn.secondary{ color: var(--ink-muted); }
   .btn:disabled{
     background: var(--panel-line);
     color: var(--ink-muted);
