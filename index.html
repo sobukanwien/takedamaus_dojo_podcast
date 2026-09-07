@@ -1462,10 +1462,10 @@ function epCard(ep, isNewest) {
           ${isNewest ? '<span class="badge-new">Neu</span>' : ''}
         </div>
         ${ep.quiz ? `
-        <a href="${ep.quiz}" onclick="event.stopPropagation()"
-           style="display:inline-block; margin-top:8px; font-size:.75rem; font-weight:700; color:var(--gold); border:1px solid var(--gold); border-radius:20px; padding:4px 12px; text-decoration:none;">
-          🎌 Quiz starten
-        </a>` : ''}
+<a href="${ep.quiz}?email=${encodeURIComponent(currentUserEmail)}" onclick="event.stopPropagation()"
+   style="display:inline-block; margin-top:8px; font-size:.75rem; font-weight:700; color:var(--gold); border:1px solid var(--gold); border-radius:20px; padding:4px 12px; text-decoration:none;">
+  🎌 Quiz starten
+</a>` : ''}
       </div>
       ${ep.speaker ? `<img src="${ep.speaker}" alt="Sprecher" class="ep-speaker-img">` : ''}
       <button class="play-icon ${currentAudioId === ep.id ? '' : 'paused'}" id="playbtn-${ep.id}" onclick="playEp(${ep.id})">
