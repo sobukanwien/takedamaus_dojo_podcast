@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reiho-Quiz — Takedamaus Dojo Podcast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #17130f;
+    --bg-soft: #1f1a15;
+    --panel: #241f19;
+    --panel-line: #3a3129;
+    --paper: #ede3d3;
+    --ink: #efe7da;
+    --ink-muted: #a99a86;
+    --red: #b3272d;
+    --red-soft: #7d2024;
+    --gold: #c9a24b;
+    --ok: #6f9a5e;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(179,39,45,0.08), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(201,162,75,0.06), transparent 45%);
+    color: var(--ink);
+    font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+    padding: 32px 16px 60px;
+  }
+  .stage{
+    width: 100%;
+    max-width: 480px;
+  }
+  header.top{
+    text-align:center;
+    margin-bottom: 26px;
+  }
+  .kanji-mark{
+    font-family:'Shippori Mincho', serif;
+    font-size: 15px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  h1{
+    font-family:'Shippori Mincho', serif;
+    font-weight:700;
+    font-size: 26px;
+    margin: 0 0 6px;
+    line-height:1.3;
+  }
+  .subline{
+    color: var(--ink-muted);
+    font-size: 14px;
+    margin:0;
+  }
+  .rule{
+    width: 64px;
+    height: 3px;
+    background: var(--red);
+    margin: 16px auto 0;
+    border-radius: 2px;
+  }
+
+  .progress-track{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin: 22px 0 28px;
+  }
+  .progress-dot{
+    width: 34px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--panel-line);
+    transition: background .3s ease;
+  }
+  .progress-dot.done{ background: var(--gold); }
+  .progress-dot.active{ background: var(--red); }
+
+  .card{
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 6px;
+    padding: 26px 22px;
+    position: relative;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    top:0; left: 22px; right: 22px;
+    height:1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity:.5;
+  }
+
+  .step-title{
+    font-family:'Shippori Mincho', serif;
+    font-size: 18px;
+    margin: 0 0 4px;
+    color: var(--paper);
+  }
+  .step-hint{
+    color: var(--ink-muted);
+    font-size: 13px;
+    margin: 0 0 20px;
+  }
+
+  /* Matching phase */
+  .match-columns{
+    display:flex;
+    gap: 14px;
+  }
+  .match-col{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+  }
+  .match-tile{
+    background: var(--bg-soft);
+    border: 1px solid var(--panel-line);
+    color: var(--ink);
+    border-radius: 5px;
+    padding: 12px 10px;
+    font-size: 13.5px;
+    line-height:1.35;
+    text-align:left;
+    cursor:pointer;
+    transition: border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .match-tile.jp{ font-style: italic; }
+  .match-tile:active{ transform: scale(0.98); }
+  .match-tile.selected{
+    border-color: var(--gold);
+    background: #2c2419;
+  }
+  .match-tile.matched{
+    border-color: var(--ok);
+    color: var(--ok);
+    cursor: default;
+    opacity: .8;
+  }
+  .match-tile.wrong{
+    border-color: var(--red);
+    animation: shake .3s ease;
+  }
+  @keyframes shake{
+    25%{ transform: translateX(-4px); }
+    75%{ transform: translateX(4px); }
+  }
+
+  /* Ordering phase */
+  .order-pool{
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .order-tile{
+    background: var(--bg-soft);
+    border: 1px solid var(--panel-line);
+    border-radius: 5px;
+    padding: 12px 14px;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink);
+    font-family: inherit;
+    cursor:pointer;
+    transition: opacity .15s ease, transform .1s ease;
+  }
+  .order-tile:active{ transform: scale(0.98); }
+  .order-tile.used{
+    opacity: .25;
+    cursor: default;
+  }
+  .order-slots{
+    display:flex;
+    flex-direction:column;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .order-slot{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    min-height: 46px;
+    border: 1px dashed var(--panel-line);
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-size: 13.5px;
+    color: var(--ink-muted);
+  }
+  .order-slot .num{
+    font-family:'Shippori Mincho', serif;
+    color: var(--gold);
+    font-size: 15px;
+    width: 16px;
+  }
+  .order-slot .slot-text{
+    color: inherit;
+  }
+  .order-slot.filled{
+    border-style: solid;
+    border-color: var(--panel-line);
+    color: var(--ink);
+    font-style: italic;
+  }
+  .order-slot.correct{ border-color: var(--ok); color: var(--ok); font-style: normal; }
+  .order-slot.wrong{ border-color: var(--red); }
+
+  .btn{
+    display:inline-block;
+    width:100%;
+    text-align:center;
+    background: var(--red);
+    color: var(--paper);
+    border:none;
+    border-radius: 5px;
+    padding: 13px 16px;
+    font-size: 14.5px;
+    font-weight:500;
+    cursor:pointer;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    transition: background .15s ease;
+  }
+  .btn, .btn.secondary{ color: var(--paper); }
+  .btn.secondary{ color: var(--ink-muted); }
+  .btn:disabled{
+    background: var(--panel-line);
+    color: var(--ink-muted);
+    cursor: not-allowed;
+  }
+  .btn.secondary{
+    background: transparent;
+    border: 1px solid var(--panel-line);
+    color: var(--ink-muted);
+  }
+
+  .feedback{
+    font-size: 13px;
+    text-align:center;
+    min-height: 18px;
+    margin: 12px 0 4px;
+    color: var(--gold);
+  }
+
+  /* Result screen */
+  .result{
+    text-align:center;
+  }
+  .result .big-kanji{
+    font-family:'Shippori Mincho', serif;
+    font-size: 46px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .result p{
+    color: var(--ink-muted);
+    font-size: 14px;
+    line-height:1.6;
+  }
+  .recap{
+    text-align:left;
+    margin: 20px 0;
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+  }
+  .recap-item{
+    border-left: 2px solid var(--gold);
+    padding-left: 12px;
+  }
+  .recap-item .jp{
+    font-style:italic;
+    font-size: 14px;
+    color: var(--paper);
+  }
+  .recap-item .de{
+    font-size: 12.5px;
+    color: var(--ink-muted);
+  }
+
+  .btn-row{
+    display:flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <header class="top">
+    <div class="kanji-mark">礼法</div>
+    <h1>Reiho — Die Grüßformen</h1>
+    <p class="subline">Ordne den Begrüßungsablauf richtig zu</p>
+    <div class="rule"></div>
+  </header>
+
+  <div class="progress-track">
+    <div class="progress-dot" data-dot="0"></div>
+    <div class="progress-dot" data-dot="1"></div>
+    <div class="progress-dot" data-dot="2"></div>
+  </div>
+
+  <div class="card" id="card"></div>
+</div>
+
+<script>
+(function(){
+
+  const PAIRS = [
+    { jp: "Keiko hajimemasu!", de: "Das Training beginnt!" },
+    { jp: "Sensei ni taishite rei!", de: "Wir verneigen uns vor den Lehrern!", variant: "Bei zwei Lehrern: „Sensei-gata ni taishite rei!“" },
+    { jp: "Otagai ni rei!", de: "Wir verneigen uns voreinander!" }
+  ];
+
+  // Nur für Schritt 1 (Zuordnen) — zusätzliche Variante, die nicht Teil der Reihenfolge in Schritt 2 ist
+  const MATCH_PAIRS = [
+    ...PAIRS,
+    { jp: "Keiko owarimasu!", de: "Das Training ist beendet!" }
+  ];
+
+  // Correct ceremonial order = the order given by Sensei above
+  const CORRECT_ORDER = [0, 1, 2];
+
+  const card = document.getElementById('card');
+  const dots = document.querySelectorAll('.progress-dot');
+
+  let state = {
+    matchedCount: 0,
+    selectedJp: null,
+    selectedDe: null,
+    orderSlots: [null, null, null],
+    orderUsed: [false, false, false]
+  };
+
+  function setDots(step){
+    dots.forEach((d, i) => {
+      d.classList.remove('done','active');
+      if (i < step) d.classList.add('done');
+      else if (i === step) d.classList.add('active');
+    });
+  }
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // ---------- STEP 0: intro ----------
+  function renderIntro(){
+    setDots(0);
+    card.innerHTML = `
+      <p class="step-title">Bevor es losgeht</p>
+      <p class="step-hint">In dieser Folge hast du drei Reiho-Kommandos gehört. Zuerst ordnest du jeden japanischen Ausdruck seiner Übersetzung zu — danach bringst du alle drei in die richtige Reihenfolge, so wie sie im Training gerufen werden.</p>
+      <button class="btn" id="start-btn">Quiz starten</button>
+    `;
+    document.getElementById('start-btn').onclick = renderMatching;
+  }
+
+  // ---------- STEP 1: matching ----------
+  function renderMatching(){
+    setDots(1);
+    state.selectedJp = null;
+    state.selectedDe = null;
+    state.matchedCount = 0;
+
+    const jpOrder = shuffle(MATCH_PAIRS.map((p, i) => i));
+    const deOrder = shuffle(MATCH_PAIRS.map((p, i) => i));
+
+    card.innerHTML = `
+      <p class="step-title">Schritt 1 — Zuordnen</p>
+      <p class="step-hint">Tippe zuerst einen japanischen Ausdruck an, dann die passende Übersetzung.</p>
+      <div class="match-columns">
+        <div class="match-col" id="col-jp"></div>
+        <div class="match-col" id="col-de"></div>
+      </div>
+      <p class="feedback" id="match-feedback"></p>
+    `;
+
+    const colJp = document.getElementById('col-jp');
+    const colDe = document.getElementById('col-de');
+
+    jpOrder.forEach(idx => {
+      const el = document.createElement('button');
+      el.className = 'match-tile jp';
+      el.textContent = MATCH_PAIRS[idx].jp;
+      el.dataset.idx = idx;
+      el.onclick = () => selectJp(el, idx);
+      colJp.appendChild(el);
+    });
+
+    deOrder.forEach(idx => {
+      const el = document.createElement('button');
+      el.className = 'match-tile';
+      el.textContent = MATCH_PAIRS[idx].de;
+      el.dataset.idx = idx;
+      el.onclick = () => selectDe(el, idx);
+      colDe.appendChild(el);
+    });
+  }
+
+  function selectJp(el, idx){
+    if (el.classList.contains('matched')) return;
+    document.querySelectorAll('#col-jp .match-tile').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+    state.selectedJp = { el, idx };
+    tryMatch();
+  }
+
+  function selectDe(el, idx){
+    if (el.classList.contains('matched')) return;
+    document.querySelectorAll('#col-de .match-tile').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+    state.selectedDe = { el, idx };
+    tryMatch();
+  }
+
+  function tryMatch(){
+    if (!state.selectedJp || !state.selectedDe) return;
+    const fb = document.getElementById('match-feedback');
+    if (state.selectedJp.idx === state.selectedDe.idx){
+      state.selectedJp.el.classList.remove('selected');
+      state.selectedDe.el.classList.remove('selected');
+      state.selectedJp.el.classList.add('matched');
+      state.selectedDe.el.classList.add('matched');
+      fb.textContent = 'Richtig!';
+      state.matchedCount++;
+      state.selectedJp = null;
+      state.selectedDe = null;
+      if (state.matchedCount === MATCH_PAIRS.length){
+        setTimeout(renderOrdering, 500);
+      }
+    } else {
+      fb.textContent = 'Das passt noch nicht zusammen — versuch es weiter.';
+      state.selectedJp.el.classList.add('wrong');
+      state.selectedDe.el.classList.add('wrong');
+      setTimeout(() => {
+        state.selectedJp.el.classList.remove('selected','wrong');
+        state.selectedDe.el.classList.remove('selected','wrong');
+        state.selectedJp = null;
+        state.selectedDe = null;
+      }, 400);
+    }
+  }
+
+  // ---------- STEP 2: ordering ----------
+  function renderOrdering(){
+    setDots(2);
+    state.orderSlots = [null, null, null];
+    state.orderUsed = [false, false, false];
+
+    const poolOrder = shuffle(PAIRS.map((p, i) => i));
+
+    card.innerHTML = `
+      <p class="step-title">Schritt 2 — Reihenfolge</p>
+      <p class="step-hint">In welcher Reihenfolge werden die Kommandos beim Reiho gerufen? Tippe die Ausdrücke nacheinander an.</p>
+      <div class="order-pool" id="order-pool"></div>
+      <div class="order-slots" id="order-slots"></div>
+      <p class="feedback" id="order-feedback"></p>
+      <button class="btn" id="check-order-btn" disabled>Überprüfen</button>
+    `;
+
+    const pool = document.getElementById('order-pool');
+    poolOrder.forEach(idx => {
+      const el = document.createElement('button');
+      el.className = 'order-tile';
+      el.textContent = PAIRS[idx].jp;
+      el.dataset.idx = idx;
+      el.onclick = () => placeInSlot(idx, el);
+      pool.appendChild(el);
+    });
+
+    const slotsWrap = document.getElementById('order-slots');
+    for (let i = 0; i < PAIRS.length; i++){
+      const s = document.createElement('div');
+      s.className = 'order-slot';
+      s.innerHTML = `<span class="num">${i + 1}</span><span class="slot-text">—</span>`;
+      slotsWrap.appendChild(s);
+    }
+
+    document.getElementById('check-order-btn').onclick = checkOrder;
+  }
+
+  function placeInSlot(idx, el){
+    if (state.orderUsed[idx]) return;
+    const nextEmpty = state.orderSlots.findIndex(s => s === null);
+    if (nextEmpty === -1) return;
+
+    state.orderSlots[nextEmpty] = idx;
+    state.orderUsed[idx] = true;
+    el.classList.add('used');
+
+    const slotEls = document.querySelectorAll('.order-slot');
+    slotEls[nextEmpty].classList.add('filled');
+    slotEls[nextEmpty].querySelector('.slot-text').textContent = PAIRS[idx].jp;
+
+    if (state.orderSlots.every(s => s !== null)){
+      document.getElementById('check-order-btn').disabled = false;
+    }
+  }
+
+  function checkOrder(){
+    const fb = document.getElementById('order-feedback');
+    const slotEls = document.querySelectorAll('.order-slot');
+    let allCorrect = true;
+
+    state.orderSlots.forEach((idx, i) => {
+      if (idx === CORRECT_ORDER[i]){
+        slotEls[i].classList.add('correct');
+      } else {
+        slotEls[i].classList.add('wrong');
+        allCorrect = false;
+      }
+    });
+
+    document.getElementById('check-order-btn').disabled = true;
+
+    if (allCorrect){
+      fb.textContent = 'Genau richtig — so läuft der Reiho ab!';
+      fb.style.color = 'var(--ok)';
+      setTimeout(renderResult, 900);
+    } else {
+      fb.textContent = 'Noch nicht ganz — schau dir die Markierungen an.';
+      fb.style.color = 'var(--red)';
+      const retryBtn = document.createElement('button');
+      retryBtn.className = 'btn secondary';
+      retryBtn.textContent = 'Nochmal versuchen';
+      retryBtn.style.marginTop = '10px';
+      retryBtn.onclick = renderOrdering;
+      card.appendChild(retryBtn);
+    }
+  }
+
+  // ---------- Result ----------
+  function renderResult(){
+    card.innerHTML = `
+      <div class="result">
+        <div class="big-kanji">よくできました</div>
+        <p>Du kennst jetzt die drei Reiho-Kommandos aus dieser Folge.</p>
+        <div class="recap">
+          ${PAIRS.map(p => `
+            <div class="recap-item">
+              <div class="jp">${p.jp}</div>
+              <div class="de">${p.de}</div>
+              ${p.variant ? `<div class="de" style="margin-top:4px; color: var(--gold);">${p.variant}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+        <div class="btn-row">
+          <button class="btn secondary" id="restart-btn">Nochmal spielen</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('restart-btn').onclick = renderIntro;
+  }
+
+  renderIntro();
+})();
+</script>
+
+</body>
+</html>
