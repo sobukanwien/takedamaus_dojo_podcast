@@ -554,6 +554,7 @@
             <div class="recap-item">
               <div class="jp">${p.jp}</div>
               <div class="de">${p.de}</div>
+              ${p.variant ? `<div class="de" style="margin-top:4px; color: var(--gold);">${p.variant}</div>` : ''}
             </div>
           `).join('')}
         </div>
