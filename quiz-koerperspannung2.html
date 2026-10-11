@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Körperspannung 2 Quiz — Takedamaus Dojo Podcast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#17130f; --bg-soft:#1f1a15; --panel:#241f19; --panel-line:#3a3129;
+    --paper:#ede3d3; --ink:#efe7da; --ink-muted:#a99a86;
+    --red:#b3272d; --red-soft:#7d2024; --gold:#c9a24b; --ok:#6f9a5e;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(179,39,45,0.08), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(201,162,75,0.06), transparent 45%);
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New','Hiragino Sans',sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:32px 16px 60px;
+  }
+  .stage{width:100%;max-width:520px;}
+  header.top{text-align:center;margin-bottom:26px;}
+  .kanji-mark{font-family:'Shippori Mincho',serif;font-size:15px;letter-spacing:.25em;color:var(--gold);margin-bottom:6px;}
+  h1{font-family:'Shippori Mincho',serif;font-weight:700;font-size:26px;margin:0 0 6px;line-height:1.3;}
+  .subline{color:var(--ink-muted);font-size:14px;margin:0;}
+  .rule{width:64px;height:3px;background:var(--red);margin:16px auto 0;border-radius:2px;}
+
+  .card{
+    background:var(--panel);border:1px solid var(--panel-line);
+    border-radius:6px;padding:26px 22px;position:relative;
+  }
+  .card::before{
+    content:"";position:absolute;top:0;left:22px;right:22px;height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5;
+  }
+  .step-title{font-family:'Shippori Mincho',serif;font-size:18px;margin:0 0 4px;color:var(--paper);}
+  .step-hint{color:var(--ink-muted);font-size:13px;margin:0 0 18px;line-height:1.5;}
+
+  .status{
+    display:flex;justify-content:space-between;
+    font-size:13px;color:var(--ink-muted);margin-bottom:14px;
+  }
+  .status b{color:var(--gold);font-weight:500;}
+
+  .group-label{
+    font-family:'Shippori Mincho',serif;font-size:14px;color:var(--gold);
+    margin:0 0 8px;
+  }
+  .terms{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
+  .meanings{display:flex;flex-direction:column;gap:8px;}
+
+  .chip,.meaning{
+    background:var(--bg-soft);border:1px solid var(--panel-line);color:var(--ink);
+    border-radius:5px;font-family:inherit;cursor:pointer;text-align:left;
+    transition:border-color .15s ease,background .15s ease,transform .1s ease;
+  }
+  .chip{padding:10px 14px;font-size:14.5px;font-weight:500;}
+  .meaning{padding:12px 14px;font-size:14px;line-height:1.5;}
+  .chip:active,.meaning:active{transform:scale(.98);}
+  .chip:focus-visible,.meaning:focus-visible,.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+
+  .chip.selected{border-color:var(--gold);background:rgba(201,162,75,0.12);color:var(--paper);}
+  .chip.done,.meaning.done{
+    border-color:var(--ok);color:var(--ok);background:rgba(111,154,94,0.1);cursor:default;
+  }
+  .meaning.done{display:block;}
+  .meaning.done .pair-term{display:block;font-family:'Shippori Mincho',serif;font-weight:700;margin-bottom:2px;color:var(--ok);}
+  .meaning.wrong,.chip.wrong{
+    border-color:var(--red);background:rgba(179,39,45,0.12);
+  }
+  .meaning:disabled,.chip:disabled{cursor:default;}
+
+  .feedback{font-size:13.5px;text-align:center;min-height:20px;margin:16px 0 0;color:var(--gold);}
+
+  .btn{
+    display:inline-block;width:100%;text-align:center;background:var(--red);color:var(--paper);
+    border:none;border-radius:5px;padding:13px 16px;font-size:14.5px;font-weight:500;cursor:pointer;
+    font-family:inherit;transition:background .15s ease;margin-top:16px;
+  }
+  .btn:hover{background:var(--red-soft);}
+
+  .result{text-align:center;}
+  .result .big-kanji{font-family:'Shippori Mincho',serif;font-size:40px;color:var(--gold);margin-bottom:6px;}
+  .result p{color:var(--ink-muted);font-size:14px;line-height:1.6;margin:6px 0;}
+  .result .score{color:var(--paper);font-size:18px;font-family:'Shippori Mincho',serif;}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <header class="top">
+    <div class="kanji-mark">体幹</div>
+    <h1>Körperspannung 2 Quiz</h1>
+    <p class="subline">Ordne die Budo-Begriffe der richtigen Bedeutung zu</p>
+    <div class="rule"></div>
+  </header>
+
+  <div class="card" id="card"></div>
+</div>
+
+<script>
+(function(){
+
+  const PAIRS = [
+    { id:'issun',   term:'Issun dome',      meaning:'Kendo: Punktgenauer Stopp ca. 2 cm vor dem Ziel – zur Kontrolle des Übungsgeräts' },
+    { id:'budoka',  term:'Budoka',          meaning:'Wir, Trainierende, die Budo betreiben' },
+    { id:'budo',    term:'Budo',            meaning:'Der Weg zu sich selbst durch Erlernen der japanischen Kampfkünste' },
+    { id:'suburi',  term:'Suburi',          meaning:'Schwertschwingen im Kendo' },
+    { id:'ukemi',   term:'Ukemi',           meaning:'Fallschule im Aikido' },
+    { id:'tome',    term:'Tome uke',        meaning:'Kendo: Ein Stopp-Block mit kurzem Impuls gegen das angreifende Schwert' },
+    { id:'akuzushi',term:'Aikido kuzushi',  meaning:'Gleichgewichtsbruch beim Trainingspartner (z. B. Mae- oder Ushiro-Kuzushi) – ohne diesen funktioniert keine Aikido-Technik' },
+    { id:'kkuzushi',term:'Kendo kuzushi',   meaning:'Gleichgewichtsbruch z. B. des gegnerischen Schwertgriffs durch einen kurzen Tome-Uke' }
+  ];
+
+  const card = document.getElementById('card');
+  let selected = null;
+  let matched = 0;
+  let mistakes = 0;
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function start(){
+    selected = null; matched = 0; mistakes = 0;
+    card.innerHTML = `
+      <p class="step-title">Was gehört zusammen?</p>
+      <p class="step-hint">Tippe zuerst auf einen Begriff und dann auf die passende Bedeutung.</p>
+      <div class="status"><span>Zugeordnet: <b id="count">0 / ${PAIRS.length}</b></span><span>Fehler: <b id="miss">0</b></span></div>
+      <p class="group-label">Begriffe</p>
+      <div class="terms" id="terms"></div>
+      <p class="group-label">Bedeutungen</p>
+      <div class="meanings" id="meanings"></div>
+      <p class="feedback" id="feedback" aria-live="polite"></p>
+    `;
+
+    const terms = document.getElementById('terms');
+    const meanings = document.getElementById('meanings');
+
+    shuffle(PAIRS).forEach(p => {
+      const b = document.createElement('button');
+      b.className = 'chip';
+      b.textContent = p.term;
+      b.dataset.id = p.id;
+      b.onclick = () => pickTerm(b);
+      terms.appendChild(b);
+    });
+
+    shuffle(PAIRS).forEach(p => {
+      const b = document.createElement('button');
+      b.className = 'meaning';
+      b.textContent = p.meaning;
+      b.dataset.id = p.id;
+      b.onclick = () => pickMeaning(b);
+      meanings.appendChild(b);
+    });
+  }
+
+  function setFeedback(text, color){
+    const fb = document.getElementById('feedback');
+    fb.textContent = text;
+    fb.style.color = color || 'var(--gold)';
+  }
+
+  function pickTerm(btn){
+    if (btn.classList.contains('done')) return;
+    document.querySelectorAll('.chip.selected').forEach(c => c.classList.remove('selected'));
+    if (selected === btn){ selected = null; setFeedback(''); return; }
+    selected = btn;
+    btn.classList.add('selected');
+    setFeedback('Jetzt die passende Bedeutung wählen.');
+  }
+
+  function pickMeaning(btn){
+    if (btn.classList.contains('done')) return;
+    if (!selected){ setFeedback('Wähle zuerst einen Begriff.'); return; }
+
+    if (selected.dataset.id === btn.dataset.id){
+      const pair = PAIRS.find(p => p.id === btn.dataset.id);
+      selected.classList.remove('selected');
+      selected.classList.add('done');
+      selected.disabled = true;
+      btn.classList.add('done');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="pair-term"></span>';
+      btn.querySelector('.pair-term').textContent = pair.term;
+      btn.appendChild(document.createTextNode(pair.meaning));
+      selected = null;
+      matched++;
+      document.getElementById('count').textContent = matched + ' / ' + PAIRS.length;
+      setFeedback('Richtig!', 'var(--ok)');
+      if (matched === PAIRS.length) setTimeout(showResult, 700);
+    } else {
+      mistakes++;
+      document.getElementById('miss').textContent = mistakes;
+      btn.classList.add('wrong');
+      selected.classList.add('wrong');
+      const a = btn, b = selected;
+      setTimeout(() => { a.classList.remove('wrong'); b.classList.remove('wrong'); }, 600);
+      setFeedback('Nicht ganz. Probier es nochmal!', 'var(--red)');
+    }
+  }
+
+  function showResult(){
+    const perfect = mistakes === 0;
+    card.innerHTML = `
+      <div class="result">
+        <div class="big-kanji">${perfect ? '優' : '良'}</div>
+        <p class="score">${perfect ? 'Perfekt, alles richtig!' : 'Geschafft!'}</p>
+        <p>Du hast alle ${PAIRS.length} Begriffe richtig zugeordnet${perfect ? '.' : ' – mit ' + mistakes + (mistakes === 1 ? ' Fehlversuch.' : ' Fehlversuchen.')}</p>
+        <p>Viel Erfolg beim Lernen und Üben! Sayonara! 🐭⚔️🥋</p>
+        <button class="btn" id="again">Nochmal spielen</button>
+      </div>
+    `;
+    document.getElementById('again').onclick = start;
+  }
+
+  start();
+})();
+</script>
+
+</body>
+</html>
