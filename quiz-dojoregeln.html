@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dojo-Regeln Quiz – Takeda Maus</title>
+<style>
+  :root{
+    --bg:#1e1f22; --card:#2b2d31; --card2:#313338; --text:#f2f3f5; --muted:#b5bac1;
+    --accent:#f0883e; --accent2:#5865f2; --ok:#3ba55d; --bad:#ed4245; --mat:#4ade80;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.45}
+  .wrap{max-width:720px;margin:0 auto;padding:16px 14px 40px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  header a{color:var(--muted);text-decoration:none;font-size:.95rem}
+  header a:hover{color:var(--text)}
+  .score-pill{background:var(--card);border-radius:999px;padding:6px 12px;font-weight:700;font-size:.95rem}
+  .progress{height:10px;background:var(--card);border-radius:999px;overflow:hidden;margin-bottom:16px}
+  .progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#ffd166);transition:width .4s}
+  .card{background:var(--card);border-radius:18px;padding:18px;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+  h1{font-size:1.7rem;margin:.2em 0 .3em;text-align:center}
+  h2{font-size:1.35rem;margin:.2em 0 .5em}
+  .phase{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:6px}
+  .pic{border-radius:14px;overflow:hidden;margin:6px 0 14px;background:#fff}
+  .pic .inner{position:relative;container-type:inline-size;margin:0 auto;max-width:100%}
+  .pic img{display:block;width:100%;height:auto}
+  .bubble{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;
+    color:#222;font-weight:700;font-family:"Comic Sans MS","Comic Neue","Segoe Print",cursive;
+    font-size:3.1cqw;line-height:1.15;padding:0 1cqw}
+  .rule{background:var(--card2);border-left:5px solid var(--accent);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+  .rule b{color:#ffd166}
+  .example{background:rgba(74,222,128,.10);border-left:5px solid var(--mat);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+  .example .lbl{font-weight:700;color:var(--mat);display:block;margin-bottom:2px}
+  .motto{text-align:center;font-size:1.15rem;font-weight:800;margin:14px 0 4px;color:#ffd166}
+  .answers{display:grid;gap:10px;margin:12px 0}
+  .answers button{all:unset;cursor:pointer;background:var(--card2);border:2px solid #45474d;border-radius:12px;
+    padding:13px 14px;font-size:1.05rem;transition:transform .1s,border-color .2s,background .2s}
+  .answers button:hover:not([disabled]){border-color:var(--accent2);transform:translateY(-1px)}
+  .answers button[disabled]{cursor:default}
+  .answers button.right{background:rgba(59,165,93,.25);border-color:var(--ok)}
+  .answers button.wrong{background:rgba(237,66,69,.22);border-color:var(--bad)}
+  .feedback{display:none;border-radius:12px;padding:12px 14px;margin-top:4px;font-size:1.02rem}
+  .feedback.ok{display:block;background:rgba(59,165,93,.18)}
+  .feedback.no{display:block;background:rgba(237,66,69,.15)}
+  .btn{display:block;width:100%;margin-top:14px;border:0;border-radius:12px;padding:14px;font-size:1.1rem;font-weight:800;
+    background:var(--accent);color:#1b1b1b;cursor:pointer}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.secondary{background:var(--card2);color:var(--text)}
+  .hidden{display:none!important}
+  .intro p{color:var(--muted);text-align:center;margin:.4em 0}
+  .intro .mice{font-size:2.6rem;text-align:center}
+  .stars{font-size:2.6rem;text-align:center;letter-spacing:.1em}
+  .result-list{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:6px}
+  .result-list li{background:var(--card2);border-radius:10px;padding:8px 12px}
+  @keyframes pop{0%{transform:scale(.95);opacity:.3}100%{transform:scale(1);opacity:1}}
+  .pop{animation:pop .3s ease-out}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="index.html">← Zurück zum Podcast</a>
+    <span class="score-pill" id="scorePill">⭐ 0</span>
+  </header>
+  <div class="progress"><div id="bar"></div></div>
+  <main class="card" id="stage"></main>
+</div>
+
+<script>
+const IMG = n => `dojoregeln/regel${n}.jpg`;
+// Seitenverhältnis (Breite/Höhe) der Bilder – damit Sprechblasen-Texte exakt sitzen
+const RATIO = {1:1000/721,2:1000/725,3:1000/535,4:1000/937,5:950/1000,6:1000/864,7:1000/930,8:999/1000,9:859/1000};
+
+const RULES = [
+  { n:1, emoji:"👀", title:"Mach die Augen auf!",
+    text:"Beobachte deine Lehrer gut. Wenn du genau hinsiehst, siehst du mehr als andere.",
+    example:"Sensei zeigt eine neue Technik vor und hebt den Arm. Die Mäuse am Rand schauen ganz genau hin – nicht nur auf die Hände, sondern auch, wo die Füße stehen. So entdecken sie Dinge, die andere übersehen!",
+    motto:"Wer genau schaut, sieht mehr!",
+    q:"Sensei zeigt eine neue Technik vor. Was machst du?",
+    a:["Ich schaue ganz genau hin – auf Hände UND Füße.","Ich schaue zum Fenster hinaus.","Ich übe schon mal etwas anderes."],
+    why:"Richtig! Mit offenen Augen lernst du am schnellsten." },
+
+  { n:2, emoji:"👂", title:"Mach deine Ohren auf!",
+    text:"Wenn du die Geheimnisse unseres Budo kennenlernen willst, musst du aufmerksam zuhören.",
+    example:"Sensei erklärt den Kindern, worauf es bei der Übung ankommt. Alle sitzen ruhig im Seiza und hören gut zu – so verpasst niemand das Geheimnis!",
+    bubbles:[{l:44,t:6,w:39,h:19,txt:"Hört gut zu, jetzt verrate ich euch ein Budo-Geheimnis …"}],
+    motto:"Gut gehört ist halb gelernt!",
+    q:"Sensei erklärt etwas. Was machen deine Ohren?",
+    a:["Sie hören aufmerksam zu.","Sie hören dem Nachbarn zu, der flüstert.","Gar nichts – ich kann das eh schon."],
+    why:"Genau! Wer gut zuhört, erfährt die Geheimnisse des Budo." },
+
+  { n:3, emoji:"❤️", title:"Öffne dein Herz!",
+    text:"Sei offen für alles Neue und behandle deine Trainingspartner immer freundlich. Sei geduldig mit ihnen und mit dir selbst!",
+    example:"Zwei Mäuse verbeugen sich freundlich voreinander, bevor sie zusammen üben. Egal ob Freund oder neues Kind – jeder Partner wird gleich freundlich begrüßt.",
+    motto:"Freundlich und geduldig – mit anderen und mit mir!",
+    q:"Heute ist ein neues Kind im Dojo und du sollst mit ihm üben. Was tust du?",
+    a:["Ich verbeuge mich freundlich und übe geduldig mit ihm.","Ich übe lieber nur mit meinen Freunden.","Ich seufze laut, weil es noch so langsam ist."],
+    why:"Super! Ein offenes Herz macht das Dojo zu einem schönen Ort für alle." },
+
+  { n:4, emoji:"🤫", title:"Halte den Mund geschlossen!",
+    text:"Das Dojo ist unser Ort des Lernens und Übens, kein Ort zum Plaudern. Wenn wir trainieren, sprechen wir nur über das, was beim Üben notwendig ist.",
+    example:"Hoppla! Diese zwei Mäuse plaudern mitten auf der Matte über das Wochenende. Das heben wir uns für nach dem Training auf – in der Garderobe ist dafür Zeit.",
+    bubbles:[{l:11,t:7,w:33,h:17,txt:"Weißt du, was ich am Wochenende gemacht habe?"},
+             {l:71,t:5,w:24,h:13,txt:"Erzähl! Erzähl!"}],
+    motto:"Im Dojo üben wir – plaudern tun wir danach!",
+    q:"Mitten im Training möchtest du deinem Partner von deinem Geburtstag erzählen. Was ist richtig?",
+    a:["Ich warte und erzähle es nach dem Training.","Ich erzähle es gleich, ganz laut.","Ich flüstere es, während Sensei erklärt."],
+    why:"Richtig! Nach dem Training gibt es genug Zeit zum Erzählen." },
+
+  { n:5, emoji:"🙇", title:"Sei respektvoll mit deinem Trainingspartner!",
+    text:"Wenn dein Partner etwas falsch macht, kritisiere ihn nicht, oder wenn er nicht weiterweiß, versuche nicht, ihn zu unterrichten. Dafür ist der Lehrer da, den man jederzeit um Hilfe bitten kann!",
+    example:"Hier schiebt eine Maus die Hände ihres Partners am Bokken herum und spielt selbst Lehrer. Das ist nicht nett! Besser: kurz die Hand heben und Sensei um Hilfe bitten.",
+    motto:"Ich bin Partner – nicht Lehrer!",
+    q:"Dein Partner macht die Technik falsch. Was machst du?",
+    a:["Ich kritisiere ihn nicht und bitte, wenn nötig, den Lehrer um Hilfe.","Ich erkläre ihm ganz genau, wie es richtig geht.","Ich sage: „Das kannst du ja gar nicht!“"],
+    why:"Genau! Fürs Erklären ist der Lehrer da – du bist ein respektvoller Partner." },
+
+  { n:6, emoji:"🤝", title:"Wir sind alle ein Team!",
+    text:"Es gibt kein „besser“ oder „schlechter“ zwischen uns. Wir halten zusammen, lernen zusammen und freuen uns über jeden Lernfortschritt.",
+    example:"Die ganze Dojo-Mäusebande steht Arm in Arm zusammen – große und kleine, Anfänger und Fortgeschrittene. Jeder gehört dazu!",
+    motto:"Zusammen lernen, zusammen freuen!",
+    q:"Ein Kind schafft heute zum ersten Mal eine Technik. Was machst du?",
+    a:["Ich freue mich mit ihm!","Ich sage: „Das kann ich schon lange.“","Ich schaue weg und sage nichts."],
+    why:"Super! Im Team freuen wir uns über jeden Fortschritt." },
+
+  { n:7, emoji:"🛡️", title:"Sicherheit!",
+    text:"Achte darauf, dass du genug Platz hast und dein Trainingspartner bereit ist! Die meisten unserer Techniken können schmerzhaft sein, deshalb hören wir sofort auf, wenn der Partner einen Schmerz spürt und mindestens zweimal hintereinander mit der Hand auf dem Boden (oder Körper) abklopft.",
+    example:"Die linke Maus will schon mit dem Bokken loslegen – aber ihr Partner schaut gerade den Fliegen nach und ist gar nicht bereit! Erst anfangen, wenn beide bereit sind.",
+    motto:"Zweimal klopfen heißt: Sofort Stopp!",
+    q:"Dein Partner klopft zweimal mit der Hand auf die Matte. Was bedeutet das?",
+    a:["Sofort aufhören – es tut ihm weh!","Ich soll schneller machen.","Er klatscht Beifall."],
+    why:"Richtig! Abklopfen heißt: sofort loslassen und aufhören." },
+
+  { n:8, emoji:"😊", title:"Wir trainieren mit Freude!",
+    text:"Wir trainieren mit Freude und ohne zu meckern. Wir alle wollen ein gutes Training haben! Wenn du einmal nicht mitmachen willst, schau aufmerksam von der Bank aus zu.",
+    example:"Diese Maus mag heute nicht mitmachen. Statt zu meckern, setzt sie sich auf die Bank und schaut aufmerksam zu – so lernt sie trotzdem etwas!",
+    motto:"Lieber zuschauen als meckern!",
+    q:"Du hast heute einmal keine Lust mitzumachen. Was tust du?",
+    a:["Ich setze mich auf die Bank und schaue aufmerksam zu.","Ich meckere laut, damit es alle hören.","Ich laufe auf der Matte herum."],
+    why:"Genau! Auch beim Zuschauen von der Bank lernt man viel." },
+
+  { n:9, emoji:"🗡️", title:"Vorsicht, kein Herumfuchteln!",
+    text:"Vorsicht, kein Herumfuchteln mit unseren Übungsgeräten! Diese sind keine Spielzeuge und werden nur wie vom Lehrer angewiesen benutzt!",
+    example:"Huiii! Diese Maus wirbelt das Bokken wild über dem Kopf herum. So bitte nicht – da kann schnell jemand getroffen werden!",
+    motto:"Bokken & Co. sind keine Spielzeuge!",
+    q:"Du bekommst ein Bokken (Holzschwert). Was machst du damit?",
+    a:["Ich benutze es nur so, wie Sensei es zeigt.","Ich wirble es herum wie ein Hubschrauber.","Ich spiele damit Pirat."],
+    why:"Richtig! Übungsgeräte benutzen wir nur so, wie der Lehrer es sagt." }
+];
+
+const shuffle = arr => { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const TOTAL_STEPS = RULES.length*2 + RULES.length; // Lernkarte + Frage pro Regel, dann Bilder-Rätsel
+const MAX_POINTS = RULES.length*2;
+
+let state;
+const stage = document.getElementById('stage');
+
+function reset(){
+  state = { step:0, points:0, mistakes:[], puzzle: shuffle(RULES) };
+  updateTop(); renderIntro();
+}
+function updateTop(){
+  document.getElementById('scorePill').textContent = `⭐ ${state.points}`;
+  document.getElementById('bar').style.width = (state.step/TOTAL_STEPS*100)+'%';
+}
+function picHTML(r){
+  const b = (r.bubbles||[]).map(x=>`<div class="bubble" style="left:${x.l}%;top:${x.t}%;width:${x.w}%;height:${x.h}%">${x.txt}</div>`).join('');
+  return `<div class="pic"><div class="inner" style="width:min(100%, calc(52vh * ${RATIO[r.n].toFixed(4)}))"><img src="${IMG(r.n)}" alt="Bild zu Regel ${r.n}: ${r.title}">${b}</div></div>`;
+}
+function show(html){ stage.innerHTML = html; stage.classList.remove('pop'); void stage.offsetWidth; stage.classList.add('pop'); window.scrollTo({top:0,behavior:'smooth'}); }
+
+function renderIntro(){
+  show(`<div class="intro">
+    <div class="mice">🐭🥋🐭</div>
+    <h1>Das große Dojo-Regeln-Quiz</h1>
+    <p>Die Takeda-Mäuse zeigen dir alle 9 Dojo-Regeln – jede mit einem Bild und einem Beispiel aus dem Dojo.</p>
+    <p><b>Teil 1:</b> Regel ansehen und eine Frage beantworten.<br><b>Teil 2:</b> Bilder-Rätsel – welche Regel passt zum Bild?</p>
+    <button class="btn" onclick="next()">Los geht's! 🚀</button>
+  </div>`);
+}
+
+function renderLearn(r){
+  show(`<span class="phase">Teil 1 · Regel ${r.n} von 9</span>
+    <h2>${r.emoji} ${r.n}. ${r.title}</h2>
+    ${picHTML(r)}
+    <div class="rule">${r.text}</div>
+    <div class="example"><span class="lbl">🐭 Beispiel im Dojo:</span>${r.example}</div>
+    <div class="motto">„${r.motto}“</div>
+    <button class="btn" onclick="next()">Zur Quizfrage ❓</button>`);
+}
+
+function renderQuestion(r){
+  const opts = shuffle(r.a.map((t,i)=>({t,ok:i===0})));
+  show(`<span class="phase">Teil 1 · Frage zu Regel ${r.n}</span>
+    <h2>${r.emoji} ${r.q}</h2>
+    <div class="answers">${opts.map((o,i)=>`<button data-ok="${o.ok}">${o.t}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>
+    <button class="btn hidden" id="nextBtn" onclick="next()">Weiter ➜</button>`);
+  wireAnswers(ok => ok ? r.why : `Nicht ganz! Denk an Regel ${r.n}: „${r.motto}“`, r);
+}
+
+function renderPuzzle(r, idx){
+  const others = shuffle(RULES.filter(x=>x.n!==r.n)).slice(0,2);
+  const opts = shuffle([r,...others]);
+  show(`<span class="phase">Teil 2 · Bilder-Rätsel ${idx+1} von 9</span>
+    <h2>🔍 Welche Regel passt zu diesem Bild?</h2>
+    ${picHTML({...r, bubbles:[]})}
+    <div class="answers">${opts.map(o=>`<button data-ok="${o.n===r.n}">${o.emoji} ${o.title}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>
+    <button class="btn hidden" id="nextBtn" onclick="next()">Weiter ➜</button>`);
+  wireAnswers(ok => ok ? `Richtig! Das ist Regel ${r.n}: ${r.title}` : `Das Bild gehört zu Regel ${r.n}: ${r.emoji} ${r.title}`, r);
+}
+
+function wireAnswers(msgFn, r){
+  const btns = [...stage.querySelectorAll('.answers button')];
+  btns.forEach(b=>b.addEventListener('click',()=>{
+    const ok = b.dataset.ok==='true';
+    btns.forEach(x=>{ x.disabled=true; if(x.dataset.ok==='true') x.classList.add('right'); });
+    if(!ok){ b.classList.add('wrong'); if(!state.mistakes.includes(r.n)) state.mistakes.push(r.n); }
+    else { state.points++; }
+    const fb = document.getElementById('fb');
+    fb.className = 'feedback ' + (ok?'ok':'no');
+    fb.textContent = (ok?'✅ ':'💡 ') + msgFn(ok);
+    document.getElementById('nextBtn').classList.remove('hidden');
+    updateTop();
+  }));
+}
+
+function renderEnd(){
+  const p = state.points, pct = p/MAX_POINTS;
+  const stars = pct===1?'⭐⭐⭐':pct>=.7?'⭐⭐☆':pct>=.4?'⭐☆☆':'☆☆☆';
+  const msg = pct===1 ? 'Perfekt! Du bist ein echter Dojo-Profi! 🥋'
+            : pct>=.7 ? 'Super gemacht! Fast alle Regeln sitzen schon.'
+            : pct>=.4 ? 'Gut! Schau dir die Regeln unten noch einmal an.'
+            : 'Übung macht den Meister – probier es gleich noch einmal!';
+  const review = state.mistakes.sort((a,b)=>a-b).map(n=>{const r=RULES[n-1];return `<li>${r.emoji} <b>${r.n}. ${r.title}</b> – „${r.motto}“</li>`;}).join('');
+  show(`<div class="intro">
+    <div class="stars">${stars}</div>
+    <h1>${p} von ${MAX_POINTS} Punkten</h1>
+    <p>${msg}</p>
+    ${review?`<h2 style="margin-top:18px">Diese Regeln nochmal merken:</h2><ul class="result-list">${review}</ul>`:''}
+    <button class="btn" onclick="reset()">Nochmal spielen 🔄</button>
+    <a href="index.html" class="btn secondary" style="text-align:center;text-decoration:none">Zurück zum Podcast</a>
+  </div>`);
+}
+
+function next(){
+  state.step++; updateTop();
+  const s = state.step, N = RULES.length;
+  if(s <= N*2){
+    const r = RULES[Math.floor((s-1)/2)];
+    (s % 2 === 1) ? renderLearn(r) : renderQuestion(r);
+  } else if(s <= N*3){
+    const i = s - N*2 - 1;
+    renderPuzzle(state.puzzle[i], i);
+  } else {
+    renderEnd();
+  }
+}
+
+// Bilder vorladen
+RULES.forEach(r=>{ const i=new Image(); i.src=IMG(r.n); });
+reset();
+</script>
+</body>
+</html>
